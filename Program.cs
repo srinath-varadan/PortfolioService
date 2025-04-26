@@ -4,6 +4,17 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // 🔥 Configure Serilog
 var splunkUrl = builder.Configuration["Splunk:CollectorUrl"];
 var splunkToken = builder.Configuration["Splunk:Token"];
@@ -27,15 +38,6 @@ var allowedOrigins = new[] {
     "https://srinath-varadan.github.io"
 };
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowGitHubPages", policy =>
-        policy
-            .WithOrigins("https://srinath-varadan.github.io")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
-});
 
 
 // Regular service setup
@@ -53,9 +55,8 @@ builder.Services.AddSingleton<PerformanceService>();
 
 var app = builder.Build();
 
-app.UseCors("AllowGitHubPages");
+app.UseCors();
 
-app.UseRouting();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
@@ -65,6 +66,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Portfolio API v1");
     });
 }
+
+
+app.UseRouting();
 
 
 app.MapControllers();
