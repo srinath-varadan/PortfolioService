@@ -1,46 +1,79 @@
-
 using Microsoft.AspNetCore.Mvc;
-using PortfolioService.Api.Logging;
-
-[ApiController]
-[Route("api/assets")]
-public class AssetController : ControllerBase
+namespace PortfolioService.Controllers
 {
-    private readonly AssetService _service;
-
-    public AssetController(AssetService service)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AssetController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly AssetService _assetService;
 
-    [HttpGet]
-    public IActionResult Get()
-    {
-        SplunkLogger.LogInformation("Fetching all assets");
-        return Ok(_service.GetAll());
-    }
+        public AssetController(AssetService assetService)
+        {
+            _assetService = assetService;
+        }
 
-    [HttpPost]
-    public IActionResult Post([FromBody] Asset asset)
-    {
-        _service.Add(asset);
-        SplunkLogger.LogInformation("Asset created", asset);
-        return Ok();
-    }
+        [HttpGet]
+        public IActionResult GetAllAssets()
+        {
+            try
+            {
+                var assets = _assetService.GetAssets();
+                SplunkLogger.LogInfo("Fetched assets successfully", HttpContext, new { Count = assets.Count });
+                return Ok(assets);
+            }
+            catch (Exception ex)
+            {
+                SplunkLogger.LogError("Failed to fetch assets", ex, HttpContext);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
 
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Asset asset)
-    {
-        _service.Update(id, asset);
-        SplunkLogger.LogInformation("Asset updated", new { Id = id, UpdatedAsset = asset });
-        return Ok();
-    }
+        [HttpPost]
+        public IActionResult AddAsset([FromBody] Asset asset)
+        {
+            try
+            {
+                _assetService.AddAsset(asset);
+                SplunkLogger.LogInfo("Added new asset successfully", HttpContext, new { Asset = asset });
+                return CreatedAtAction(nameof(GetAllAssets), new { id = asset.Id }, asset);
+            }
+            catch (Exception ex)
+            {
+                SplunkLogger.LogError("Failed to add asset", ex, HttpContext);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-    {
-        _service.Delete(id);
-        SplunkLogger.LogInformation("Asset deleted", new { Id = id });
-        return Ok();
+        [HttpPut("{id}")]
+        public IActionResult UpdateAsset(int id, [FromBody] Asset asset)
+        {
+            try
+            {
+                _assetService.UpdateAsset(id, asset);
+                SplunkLogger.LogInfo("Updated asset successfully", HttpContext, new { AssetId = id });
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                SplunkLogger.LogError("Failed to update asset", ex, HttpContext);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteAsset(int id)
+        {
+            try
+            {
+                _assetService.DeleteAsset(id);
+                SplunkLogger.LogInfo("Deleted asset successfully", HttpContext, new { AssetId = id });
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                SplunkLogger.LogError("Failed to delete asset", ex, HttpContext);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
     }
 }

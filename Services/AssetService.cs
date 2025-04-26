@@ -6,10 +6,10 @@ public class AssetService
         new Asset { Id = 2, Name = "Bonds", Allocation = 30, Risk = "Low", ExpectedReturn = 3.2, Liquidity = "Medium", Volatility = 4.3, MarketCap = 1500, Region = "US", TaxImplication = "Interest Income" }
     };
 
-    public List<Asset> GetAll() => _assets;
+    public List<Asset> GetAssets() => _assets;
     public Asset GetById(int id) => _assets.FirstOrDefault(a => a.Id == id);
-    public void Add(Asset asset) => _assets.Add(asset);
-    public void Update(int id, Asset updated)
+    public void AddAsset(Asset asset) => _assets.Add(asset);
+    public void UpdateAsset(int id, Asset updated)
     {
         var asset = GetById(id);
         if (asset != null)
@@ -25,5 +25,5 @@ public class AssetService
             asset.TaxImplication = updated.TaxImplication;
         }
     }
-    public void Delete(int id) => _assets.RemoveAll(a => a.Id == id);
+    public void DeleteAsset(int id) => _assets.RemoveAll(a => a.Id == id);
 }

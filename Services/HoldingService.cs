@@ -6,10 +6,10 @@ public class HoldingService
         new Holding { Id = 2, Name = "US Treasury Bond", AssetClass = "Bonds", Ticker = "USTB10Y", Quantity = 30, PurchasePrice = 98.00, CurrentPrice = 100.00, MarketValue = 3000, GainLoss = 60, Weight = 10 }
     };
 
-    public List<Holding> GetAll() => _holdings;
+    public List<Holding> GetHoldings() => _holdings;
     public Holding GetById(int id) => _holdings.FirstOrDefault(h => h.Id == id);
-    public void Add(Holding holding) => _holdings.Add(holding);
-    public void Update(int id, Holding updated)
+    public void AddHolding(Holding holding) => _holdings.Add(holding);
+    public void UpdateHolding(int id, Holding updated)
     {
         var holding = GetById(id);
         if (holding != null)
@@ -25,5 +25,5 @@ public class HoldingService
             holding.Weight = updated.Weight;
         }
     }
-    public void Delete(int id) => _holdings.RemoveAll(h => h.Id == id);
+    public void DeleteHolding(int id) => _holdings.RemoveAll(h => h.Id == id);
 }

@@ -1,21 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
-using PortfolioService.Api.Logging;
 
-[ApiController]
-[Route("api/performance")]
-public class PerformanceController : ControllerBase
+namespace PortfolioService.Controllers
 {
-    private readonly PerformanceService _service;
-
-    public PerformanceController(PerformanceService service)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PerformanceController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly PerformanceService _performanceService;
 
-    [HttpGet]
-    public IActionResult Get()
-    {
-        SplunkLogger.LogInformation("Fetching performance history");
-        return Ok(_service.GetAll());
+        public PerformanceController(PerformanceService performanceService)
+        {
+            _performanceService = performanceService;
+        }
+
+        [HttpGet]
+        public IActionResult GetPerformanceHistory()
+        {
+            try
+            {
+                var history = _performanceService.GetAll();
+                SplunkLogger.LogInfo("Fetched performance history successfully", HttpContext, new { Count = history.Count });
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                SplunkLogger.LogError("Failed to fetch performance history", ex, HttpContext);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
     }
 }
