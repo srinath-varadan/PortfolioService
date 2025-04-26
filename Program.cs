@@ -59,7 +59,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
 }
 
-app.UseCors("AllowAll");
+app.UseCors("AllowGitHubPages");
 
 app.MapControllers();
 
