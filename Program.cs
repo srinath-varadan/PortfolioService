@@ -23,6 +23,18 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+var allowedOrigins = new[] {
+    "https://srinath-varadan.github.io"
+};
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowGitHubPages", policy =>
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 
 // Regular service setup
 builder.Services.AddControllers();
