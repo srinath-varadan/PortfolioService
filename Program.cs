@@ -34,10 +34,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-var allowedOrigins = new[] {
-    "https://srinath-varadan.github.io"
-};
-
 
 
 // Regular service setup
@@ -55,6 +51,9 @@ builder.Services.AddSingleton<PerformanceService>();
 
 var app = builder.Build();
 
+
+app.UseRouting();
+
 app.UseCors();
 
 
@@ -68,7 +67,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 
-app.UseRouting();
 
 
 app.MapControllers();
