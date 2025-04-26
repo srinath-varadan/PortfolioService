@@ -44,14 +44,6 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Portfolio API", Version = "v1" });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod());
-});
-
 builder.Services.AddSingleton<AssetService>();
 builder.Services.AddSingleton<HoldingService>();
 builder.Services.AddSingleton<PerformanceService>();
