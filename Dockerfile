@@ -1,18 +1,21 @@
-# Dockerfile (for .NET 9)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview AS base
+# Use official .NET 8 runtime for production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 5000
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
+# Build stage with SDK
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Adjust COPY if your csproj is at root or inside folder
+# Copy only csproj and restore early (better caching)
 COPY ["PortfolioService.csproj", "./"]
 RUN dotnet restore "PortfolioService.csproj"
 
+# Copy everything else and build
 COPY . .
 RUN dotnet publish "PortfolioService.csproj" -c Release -o /app/publish
 
+# Final runtime stage
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
