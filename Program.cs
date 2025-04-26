@@ -29,10 +29,15 @@ var allowedOrigins = new[] {
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowGitHubPages", policy =>
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    options.AddDefaultPolicy(builder =>
+    {
+        builder
+            .WithOrigins("https://srinath-varadan.github.io")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(origin => true) // allow any origin
+            .AllowCredentials();
+    });
 });
 
 
@@ -44,11 +49,21 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Portfolio API", Version = "v1" });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddSingleton<AssetService>();
 builder.Services.AddSingleton<HoldingService>();
 builder.Services.AddSingleton<PerformanceService>();
 
 var app = builder.Build();
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
@@ -59,7 +74,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     });
 }
 
-app.UseCors("AllowGitHubPages");
 
 app.MapControllers();
 
