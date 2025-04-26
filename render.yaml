@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: portfolio-api
+    env: docker
+    repo: https://github.com/srinath-varadan/PortfolioService.git  # 👈 update this!
+    branch: main
+    dockerfilePath: ./Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    envVars:
+      - key: Splunk__CollectorUrl
+        value: https://prd-p-phf6t.splunkcloud.com:8088/services/collector
+      - key: Splunk__Token
+        value: e45fb617-7cec-4362-9ad2-df707e1a3761
+    plan: free
