@@ -1,3 +1,4 @@
+using LogAggregatorService.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace PortfolioService.Controllers
 {
@@ -6,9 +7,11 @@ namespace PortfolioService.Controllers
     public class AssetController : ControllerBase
     {
         private readonly AssetService _assetService;
+        private readonly NewRelicLogger _logger;
 
-        public AssetController(AssetService assetService)
+        public AssetController(AssetService assetService,NewRelicLogger logger)
         {
+            _logger = logger;
             _assetService = assetService;
         }
 
@@ -18,12 +21,27 @@ namespace PortfolioService.Controllers
             try
             {
                 var assets = _assetService.GetAssets();
-                SplunkLogger.LogInfo("Fetched assets successfully", HttpContext, new { Count = assets.Count });
+                 _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(GetAllAssets),
+            httpVerb: HttpContext.Request.Method,
+            payload: null,
+            message: "Asset fetched Successfully",
+            level: "info"
+        );
+
                 return Ok(assets);
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to fetch assets", ex, HttpContext);
+                 _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(GetAllAssets),
+            httpVerb: HttpContext.Request.Method,
+            payload: null,
+            message: $"Asset fetch Failed: {ex.Message}",
+            level: "error"
+        );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -34,12 +52,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _assetService.AddAsset(asset);
-                SplunkLogger.LogInfo("Added new asset successfully", HttpContext, new { Asset = asset });
+                _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(AddAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: asset,
+            message: "Asset Created Successfully",
+            level: "info"
+        );
                 return CreatedAtAction(nameof(GetAllAssets), new { id = asset.Id }, asset);
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to add asset", ex, HttpContext);
+                _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(AddAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: asset,
+            message: $"Asset Creation Failed: {ex.Message}",
+            level: "error"
+        );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -50,12 +82,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _assetService.UpdateAsset(id, asset);
-                SplunkLogger.LogInfo("Updated asset successfully", HttpContext, new { AssetId = id });
+                _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(UpdateAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: asset,
+            message: "Asset update Successfully",
+            level: "info"
+        );
                 return NoContent();
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to update asset", ex, HttpContext);
+                _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(UpdateAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: asset,
+            message: $"Asset update Failed: {ex.Message}",
+            level: "error"
+        );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -66,12 +112,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _assetService.DeleteAsset(id);
-                SplunkLogger.LogInfo("Deleted asset successfully", HttpContext, new { AssetId = id });
+                   _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(DeleteAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: id,
+            message: "Asset deleted Successfully",
+            level: "info"
+        );
                 return NoContent();
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to delete asset", ex, HttpContext);
+                  _logger.LogDetailedAsync(
+            controller: "AssetController",
+            method: nameof(DeleteAsset),
+            httpVerb: HttpContext.Request.Method,
+            payload: id,
+            message: $"Asset delete Failed: {ex.Message}",
+            level: "error"
+        );
                 return StatusCode(500, "Internal Server Error");
             }
         }

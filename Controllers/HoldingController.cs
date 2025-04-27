@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using LogAggregatorService.Services; // Assuming NewRelicLogger is here
 
 namespace PortfolioService.Controllers
 {
@@ -7,10 +8,12 @@ namespace PortfolioService.Controllers
     public class HoldingController : ControllerBase
     {
         private readonly HoldingService _holdingService;
+        private readonly NewRelicLogger _logger;
 
-        public HoldingController(HoldingService holdingService)
+        public HoldingController(HoldingService holdingService, NewRelicLogger logger)
         {
             _holdingService = holdingService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -19,12 +22,26 @@ namespace PortfolioService.Controllers
             try
             {
                 var holdings = _holdingService.GetHoldings();
-                SplunkLogger.LogInfo("Fetched holdings successfully", HttpContext, new { Count = holdings.Count });
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(GetAllHoldings),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: new { Count = holdings.Count },
+                    message: "Fetched holdings successfully",
+                    level: "info"
+                );
                 return Ok(holdings);
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to fetch holdings", ex, HttpContext);
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(GetAllHoldings),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: null,
+                    message: $"Failed to fetch holdings: {ex.Message}",
+                    level: "error"
+                );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -35,12 +52,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _holdingService.AddHolding(holding);
-                SplunkLogger.LogInfo("Added new holding successfully", HttpContext, new { Holding = holding });
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(AddHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: holding,
+                    message: "Added new holding successfully",
+                    level: "info"
+                );
                 return CreatedAtAction(nameof(GetAllHoldings), new { id = holding.Id }, holding);
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to add holding", ex, HttpContext);
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(AddHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: holding,
+                    message: $"Failed to add holding: {ex.Message}",
+                    level: "error"
+                );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -51,12 +82,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _holdingService.UpdateHolding(id, holding);
-                SplunkLogger.LogInfo("Updated holding successfully", HttpContext, new { HoldingId = id });
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(UpdateHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: new { HoldingId = id, UpdatedHolding = holding },
+                    message: "Updated holding successfully",
+                    level: "info"
+                );
                 return NoContent();
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to update holding", ex, HttpContext);
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(UpdateHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: new { HoldingId = id, Payload = holding },
+                    message: $"Failed to update holding: {ex.Message}",
+                    level: "error"
+                );
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -67,12 +112,26 @@ namespace PortfolioService.Controllers
             try
             {
                 _holdingService.DeleteHolding(id);
-                SplunkLogger.LogInfo("Deleted holding successfully", HttpContext, new { HoldingId = id });
+                 _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(DeleteHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: new { HoldingId = id },
+                    message: "Deleted holding successfully",
+                    level: "info"
+                );
                 return NoContent();
             }
             catch (Exception ex)
             {
-                SplunkLogger.LogError("Failed to delete holding", ex, HttpContext);
+                _logger.LogDetailedAsync(
+                    controller: nameof(HoldingController),
+                    method: nameof(DeleteHolding),
+                    httpVerb: HttpContext.Request.Method,
+                    payload: new { HoldingId = id },
+                    message: $"Failed to delete holding: {ex.Message}",
+                    level: "error"
+                );
                 return StatusCode(500, "Internal Server Error");
             }
         }
