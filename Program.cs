@@ -1,6 +1,8 @@
 using Serilog;
 using Serilog.Sinks.Splunk;
 using Microsoft.OpenApi.Models;
+using Prometheus;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,11 @@ var app = builder.Build();
 app.UseRouting();
 
 app.UseCors();
+
+app.UseHttpMetrics(); // Collect HTTP request metrics
+
+// Add Prometheus metrics endpoint
+app.MapMetrics(); // Exposes metrics at /metrics
 
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
