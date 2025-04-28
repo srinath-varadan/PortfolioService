@@ -39,7 +39,7 @@ namespace LogAggregatorService.Services
             {
                 Content = new StringContent(JsonSerializer.Serialize(logEntry), System.Text.Encoding.UTF8, "application/json")
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Api-Key", _licenseKey);
+            request.Headers.Add("Api-Key", _licenseKey);
 
             var response = Task.Run(()=>_client.SendAsync(request)).Result; 
 
