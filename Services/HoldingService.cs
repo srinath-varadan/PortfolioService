@@ -11,7 +11,7 @@ public class HoldingService
     public void AddHolding(Holding holding) => _holdings.Add(holding);
     public void UpdateHolding(int id, Holding updated)
     {
-        var holding = GetById(id);
+        var holding = _holdings.FirstOrDefault(h => h.Id == id);
         if (holding != null)
         {
             holding.Name = updated.Name;

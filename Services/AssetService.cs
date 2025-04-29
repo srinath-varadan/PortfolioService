@@ -11,19 +11,24 @@ public class AssetService
     public void AddAsset(Asset asset) => _assets.Add(asset);
     public void UpdateAsset(int id, Asset updated)
     {
-        var asset = GetById(id);
-        if (asset != null)
-        {
-            asset.Name = updated.Name;
-            asset.Allocation = updated.Allocation;
-            asset.Risk = updated.Risk;
-            asset.ExpectedReturn = updated.ExpectedReturn;
-            asset.Liquidity = updated.Liquidity;
-            asset.Volatility = updated.Volatility;
-            asset.MarketCap = updated.MarketCap;
-            asset.Region = updated.Region;
-            asset.TaxImplication = updated.TaxImplication;
-        }
+    var asset = _assets.FirstOrDefault(a => a.Id == id);
+    if (asset == null)
+    {
+        return; // Asset not found
     }
+
+    // Only update the fields individually (do not create a new object)
+    asset.Name = updated.Name;
+    asset.Allocation = updated.Allocation;
+    asset.Risk = updated.Risk;
+    asset.ExpectedReturn = updated.ExpectedReturn;
+    asset.Liquidity = updated.Liquidity;
+    asset.Volatility = updated.Volatility;
+    asset.MarketCap = updated.MarketCap;
+    asset.Region = updated.Region;
+    asset.TaxImplication = updated.TaxImplication;
+
+    return;
+}
     public void DeleteAsset(int id) => _assets.RemoveAll(a => a.Id == id);
 }
