@@ -30,6 +30,7 @@ public class Holding
 // Models/PerformanceEntry.cs
 public class PerformanceEntry
 {
+    public string Name { get; set; }
     public string Date { get; set; }
     public double Open { get; set; }
     public double High { get; set; }
