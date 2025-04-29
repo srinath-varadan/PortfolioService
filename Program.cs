@@ -48,6 +48,7 @@ builder.Services.AddSingleton<PerformanceService>();
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseForwardedHeaders();
 app.UseRouting();
 
