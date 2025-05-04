@@ -1,6 +1,6 @@
 public class PerformanceService
 {
-    private readonly List<PerformanceEntry> _performance = new()
+    private List<PerformanceEntry> _performance = new()
     {
         // Apple Inc. Performance
         new PerformanceEntry { Name = "Apple Inc.", Date = "2024-01-01", Open = 150, High = 160, Low = 145, Close = 155 },
